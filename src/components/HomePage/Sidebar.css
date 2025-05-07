@@ -1,0 +1,45 @@
+.sidebar {
+    width: 240px;
+    background-color: #343a40; /* Couleur sombre pour la sidebar */
+    color: #adb5bd; /* Couleur de texte claire */
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* Empêche la sidebar de rétrécir */
+  }
+  
+  .sidebar-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #495057;
+  }
+  
+  .sidebar-header h3 {
+      color: #fff; /* Texte blanc pour le titre */
+      margin: 0;
+  }
+  
+  
+  .sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+  }
+  
+  .sidebar-nav li a {
+    display: block;
+    padding: 12px 20px;
+    color: #adb5bd;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  
+  .sidebar-nav li a:hover {
+    background-color: #495057;
+    color: #fff;
+  }
+  
+  .sidebar-nav li.active a {
+      background-color: #007bff; /* Couleur pour l'élément actif */
+      color: #fff;
+  }
+  
