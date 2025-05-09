@@ -1,0 +1,70 @@
+/* Style général de l'en-tête */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, #4f46e5, #3b82f6); /* Dégradé dynamique */
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: 1px solid #ccc;
+  font-family: 'Segoe UI', sans-serif;
+  position: relative;
+}
+
+/* Style des breadcrumbs */
+.breadcrumbs h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.breadcrumbs .path {
+  font-size: 0.85rem;
+  color: #dbeafe;
+}
+
+/* Section de droite de l'en-tête */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+/* Bouton de notification avec effet */
+.notification-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem; /* Légèrement plus grand pour attirer l'attention */
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.notification-btn:hover {
+  transform: scale(1.1); /* Effet de zoom au survol */
+  color: #ffbb33; /* Change la couleur au survol */
+}
+
+/* Profil de l'utilisateur */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.user-profile:hover {
+  transform: scale(1.05); /* Effet d'agrandissement au survol */
+  color: #ffbb33; /* Change la couleur au survol */
+}
+
+.user-icon {
+  font-size: 2rem; /* Augmentation de la taille de l'icône */
+}
+
+.user-name {
+  font-size: 1rem; /* Taille de texte plus grande */
+  font-weight: 500;
+}

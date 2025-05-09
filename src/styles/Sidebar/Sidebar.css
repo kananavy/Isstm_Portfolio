@@ -1,0 +1,115 @@
+/* Sidebar principal */
+.sidebar {
+  width: 250px;
+  background-color: #343a40; /* Fond sombre */
+  color: white;
+  padding: 20px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.3s ease; /* Animation pour l’ouverture/fermeture */
+  transform: translateX(0); /* Sidebar visible par défaut */
+}
+
+/* Sidebar fermée (sur mobile ou lorsqu'on la cache) */
+.sidebar.closed {
+  transform: translateX(-250px); /* Cache la sidebar */
+}
+
+/* En-tête de la sidebar */
+.sidebar-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.sidebar-header p {
+  margin: 5px 0;
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+/* Menu de la sidebar */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+/* Items du menu */
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 1.2rem;
+  position: relative; /* Pour l'animation de l'icône */
+}
+
+/* Effet de survol */
+.menu-item:hover {
+  background-color: #007bff; /* Couleur de survol */
+  color: white;
+}
+
+/* Animation sur les icônes */
+.menu-icon {
+  margin-right: 15px;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.menu-item:hover .menu-icon {
+  transform: scale(1.2); /* Agrandissement de l'icône au survol */
+}
+
+/* Pour mobile, réduire la taille de la sidebar */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px; /* Réduction de la largeur sur mobile */
+  }
+
+  /* Animation mobile : Sidebar cachée ou visible */
+  .sidebar.closed {
+    transform: translateX(-200px);
+  }
+
+  .sidebar .sidebar-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .sidebar .menu-item {
+    font-size: 1.1rem;
+  }
+}
+
+/* Ajout d'un bouton pour mobile afin de fermer/ouvrir la sidebar */
+.sidebar-toggle {
+  position: absolute;
+  top: 20px;
+  left: 250px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: white;
+  cursor: pointer;
+  display: none; /* Caché sur les écrans plus grands */
+}
+
+@media (max-width: 768px) {
+  .sidebar-toggle {
+    display: block; /* Affiché uniquement sur les petits écrans */
+  }
+}

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import '../App.css'; // Importer le fichier CSS
-// Assurez-vous que le chemin vers votre image est correct
-// Si l'image est dans le dossier 'public', utilisez '/Image/1686918905551.jpg'
-// Si elle est importée depuis 'src', utilisez la variable importée comme ci-dessous
+import '../../App.css'; // Importer le fichier CSS
+import '../../styles/AuthPage/AuthPage.css'; // ✅ Import correct du style
 import logoImage from '../assets/Logo ISSTM.jpg'; // Ajustez ce chemin
 
 function AuthPage() {
