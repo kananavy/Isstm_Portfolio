@@ -1,46 +1,55 @@
-import React, { useState } from 'react';
-import { FaHome, FaUser, FaList, FaCog, FaChartBar } from 'react-icons/fa'; // Icônes de react-icons
-import '../../styles/Sidebar/Sidebar.css'; // ✅ Import correct du style
+// src/components/Sidebar/Sidebar.jsx
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { FaHome, FaUser, FaList, FaCog, FaChartBar } from 'react-icons/fa';
+import '../../styles/Sidebar/Sidebar.css';
+import isstmLogo from '../../assets/logo.png';
 
 function Sidebar() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // État pour ouvrir/fermer la sidebar
+  const location = useLocation();
 
-  // Fonction pour basculer l'état de la sidebar
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <div className={`sidebar ${isSidebarOpen ? '' : 'closed'}`}>
-      <button className="sidebar-toggle" onClick={toggleSidebar}>
-        {isSidebarOpen ? '☰' : '×'} {/* Symbole pour ouvrir/fermer */}
-      </button>
-
+    <div className="sidebar text-white p-3" style={{ width: '250px' }}>
       <div className="sidebar-header">
-        <h2>ISSTM</h2>
-        <p>Menu principal</p>
+      <img
+          src={isstmLogo}
+          alt="Logo ISSTM"
+          style={{ width: '120px', height: 'auto' }}
+        />
       </div>
 
       <ul className="sidebar-menu">
-        <li className="menu-item">
-          <FaHome className="menu-icon" />
-          <span>Accueil</span>
+        <li className={`menu-item ${isActive('/') ? 'active' : ''}`}>
+          <Link to="/" className="menu-link">
+            <FaHome className="menu-icon" />
+            <span>Accueil</span>
+          </Link>
         </li>
-        <li className="menu-item">
-          <FaUser className="menu-icon" />
-          <span>Utilisateurs</span>
+        <li className={`menu-item ${isActive('/utilisateurs') ? 'active' : ''}`}>
+          <Link to="/utilisateurs" className="menu-link">
+            <FaUser className="menu-icon" />
+            <span>Utilisateurs</span>
+          </Link>
         </li>
-        <li className="menu-item">
-          <FaList className="menu-icon" />
-          <span>Liste des étudiants</span>
+        <li className={`menu-item ${isActive('/etudiants') ? 'active' : ''}`}>
+          <Link to="/etudiants" className="menu-link">
+            <FaList className="menu-icon" />
+            <span>Liste des étudiants</span>
+          </Link>
         </li>
-        <li className="menu-item">
-          <FaChartBar className="menu-icon" />
-          <span>Statistiques</span>
+        <li className={`menu-item ${isActive('/statistiques') ? 'active' : ''}`}>
+          <Link to="/statistiques" className="menu-link">
+            <FaChartBar className="menu-icon" />
+            <span>Statistiques</span>
+          </Link>
         </li>
-        <li className="menu-item">
-          <FaCog className="menu-icon" />
-          <span>Paramètres</span>
+        <li className={`menu-item ${isActive('/parametres') ? 'active' : ''}`}>
+          <Link to="/parametres" className="menu-link">
+            <FaCog className="menu-icon" />
+            <span>Paramètres</span>
+          </Link>
         </li>
       </ul>
     </div>

@@ -1,21 +1,11 @@
- .dashboard-title {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #333;
-      font-size: 1.5em;
-  }
-  
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Grille responsive */
-    gap: 20px; /* Espace entre les cartes */
-    margin-bottom: 30px;
-  }
-  
-  .actions-grid {
-    display: grid;
-    /* Ajustez le nombre de colonnes ou utilisez auto-fit */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
-  
+/* DashboardOverview.css */
+
+/* Facultatif : stylisation supplémentaire */
+.card {
+  min-height: 100%;
+}
+
+.card .card-header {
+  font-weight: 600;
+  font-size: 1rem;
+}

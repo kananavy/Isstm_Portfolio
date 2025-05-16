@@ -1,10 +1,10 @@
 import React from 'react';
-import '../../styles/Header/Header.css'; // ✅ Import correct du style
+import '../../styles/Header/Header.css';
 import { FaUserCircle, FaBell } from 'react-icons/fa';
 
-function Header() {
+function Header({ isSidebarOpen }) {
   return (
-    <header className="header">
+    <header className={`header ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       <div className="breadcrumbs">
         <h2>Tableau de bord</h2>
         <span className="path">Administrateur / Aperçu</span>

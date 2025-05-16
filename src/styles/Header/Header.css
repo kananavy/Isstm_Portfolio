@@ -1,18 +1,33 @@
 /* Style général de l'en-tête */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: linear-gradient(to right, #4f46e5, #3b82f6); /* Dégradé dynamique */
+  position: fixed;
+  top: 0;
+  height: 70px;
+  /* background: linear-gradient(to right, #4f46e5, #3b82f6); */
+  background-color: rgb(17, 59, 5);
   color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border-bottom: 1px solid #ccc;
-  font-family: 'Segoe UI', sans-serif;
-  position: relative;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  width: 100%;
 }
 
-/* Style des breadcrumbs */
+/* Quand la sidebar est ouverte */
+.header.sidebar-open {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+}
+
+/* Plein écran quand la sidebar est fermée */
+.header.sidebar-closed {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* Breadcrumbs */
 .breadcrumbs h2 {
   margin: 0;
   font-size: 1.5rem;
@@ -24,29 +39,27 @@
   color: #dbeafe;
 }
 
-/* Section de droite de l'en-tête */
+/* Section droite */
 .header-right {
   display: flex;
   align-items: center;
   gap: 1.2rem;
 }
 
-/* Bouton de notification avec effet */
 .notification-btn {
   background: transparent;
   border: none;
   color: white;
-  font-size: 1.5rem; /* Légèrement plus grand pour attirer l'attention */
+  font-size: 1.5rem;
   cursor: pointer;
   transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .notification-btn:hover {
-  transform: scale(1.1); /* Effet de zoom au survol */
-  color: #ffbb33; /* Change la couleur au survol */
+  transform: scale(1.1);
+  color: #ffbb33;
 }
 
-/* Profil de l'utilisateur */
 .user-profile {
   display: flex;
   align-items: center;
@@ -56,15 +69,23 @@
 }
 
 .user-profile:hover {
-  transform: scale(1.05); /* Effet d'agrandissement au survol */
-  color: #ffbb33; /* Change la couleur au survol */
+  transform: scale(1.05);
+  color: #ffbb33;
 }
 
 .user-icon {
-  font-size: 2rem; /* Augmentation de la taille de l'icône */
+  font-size: 2rem;
 }
 
 .user-name {
-  font-size: 1rem; /* Taille de texte plus grande */
+  font-size: 1rem;
   font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header.sidebar-open {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
 }
