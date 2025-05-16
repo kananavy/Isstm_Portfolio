@@ -1,104 +1,177 @@
-import React from "react";
-import StatsCard from "../../components/StatsCard/StatsCard";
-import ActionCard from "../../components/ActionCard/ActionCard";
-import "../../styles/DashboardOverview/DashboardOverview.css";
+import React, { useState, useMemo } from 'react';
+import { Card, Row, Col, Form, Table } from 'react-bootstrap';
+import { FaUniversity, FaGraduationCap, FaList } from 'react-icons/fa';
 
-function DashboardOverview() {
-  const statsData = [
-    {
-      title: "Nombre total d'étudiant·e·s",
-      value: "Au total, nous avons\n195 étudiant·e·s\ncette année !",
-    },
-    {
-      title: "Répartition par âge",
-      value: "33 < 20 ans\n137 < 25 ans\n25 ≥ 25 ans",
-    },
-    {
-      title: "Répartition par nationalité",
-      value: "190 Malagasy\n5 Étranger·e·s",
-    },
-    { title: "Répartition par niveau", value: "62 en L1\n69 en L2\n64 en L3" },
-    { title: "Répartition par genre", value: "128 Féminin\n66 Masculin" },
-    {
-      title: "Répartition par mention",
-      value: "44 Gestion\n80 Infirmier·e·s\n70 Sage-femmes",
-    },
-  ];
+const formations = {
+  'Licence professionnelle': {
+    STNPA: [
+      'Génie Informatique',
+      'Génie Électronique Informatique',
+      'Génie Biomédical (L2 après PACES ou équivalent)',
+    ],
+    STI: ['Génie Électrique', 'Génie Industriel', 'Froid et Énergie'],
+    STGC: [
+      'Bâtiments et Travaux Publics',
+      'Génie Hydraulique',
+      "Génie de l'Architecture",
+    ],
+  },
+  'Master Ingénieur': {
+    STNPA: [
+      'Génie Logiciel',
+      'Électronique et Informatique Industrielle',
+      'Télécommunications et Réseaux',
+      'Génie Biomédical',
+    ],
+    STI: [
+      'Ingénierie des Systèmes Électriques Automatisés',
+      'Génie Industriel',
+      'Froid et Énergie',
+    ],
+    STGC: [
+      'Bâtiments et Travaux Publics',
+      'Aménagements et Travaux Publics',
+      'Hydrauliques et Ouvrages',
+    ],
+  },
+};
 
-  const actionData = [
-    {
-      title: "Utilisateurs, personnels & enseignant·e·s",
-      links: [
-        { text: "Liste des utilisateurs", href: "#" },
-        { text: "Liste des personnels administratifs", href: "#" },
-        { text: "Liste de toutes les enseignant·e·s", href: "#" },
-      ],
-    },
-    {
-      title: "Gestion de l’établissement",
-      links: [
-        { text: "Mentions", href: "#" },
-        { text: "Parcours", href: "#" },
-        { text: "Unités d’enseignement", href: "#" },
-        { text: "Éléments Constitutifs", href: "#" },
-        { text: "Salles disponibles", href: "#" },
-        { text: "Niveaux d’étude", href: "#" },
-        { text: "Semestres", href: "#" },
-        { text: "Horaires enseignants", href: "#" },
-      ],
-    },
-    {
-      title: "Gestion des étudiant·e·s",
-      links: [
-        { text: "Ajouter un·e étudiant·e", href: "#" },
-        { text: "Liste des étudiant·e·s", href: "#" },
-        { text: "Paiements", href: "#" },
-        { text: "Absences", href: "#" },
-      ],
-    },
-    {
-      title: "Gestion de notes",
-      links: [
-        { text: "Notes L1 Gestion", href: "#" },
-        { text: "Notes L1 IG", href: "#" },
-        { text: "Notes L1 SF", href: "#" },
-        { text: "Notes L2 Gestion", href: "#" },
-        { text: "Notes L2 IG", href: "#" },
-        { text: "Notes L2 SF", href: "#" },
-        { text: "Notes L3 Gestion", href: "#" },
-        { text: "Notes L3 IG", href: "#" },
-        { text: "Notes L3 SF", href: "#" },
-      ],
-    },
-  ];
+export default function DashboardOverview() {
+  const [niveau, setNiveau] = useState('');
+  const [mention, setMention] = useState('');
+  const [parcours, setParcours] = useState('');
+
+  const mentions = niveau ? Object.keys(formations[niveau]) : [];
+  const parcoursList =
+    niveau && mention ? formations[niveau][mention] : [];
+
+  const lignes = useMemo(() => {
+    const res = [];
+    Object.entries(formations).forEach(([niv, mentionsObj]) => {
+      if (niveau && niv !== niveau) return;
+      Object.entries(mentionsObj).forEach(([men, parcs]) => {
+        if (mention && men !== mention) return;
+        parcs.forEach((parc) => {
+          if (parcours && parc !== parcours) return;
+          res.push({ niveau: niv, mention: men, parcours: parc });
+        });
+      });
+    });
+    return res;
+  }, [niveau, mention, parcours]);
+
+  const countLicence = Object.values(formations['Licence professionnelle'] || {}).flat().length;
+  const countMaster = Object.values(formations['Master Ingénieur'] || {}).flat().length;
+  const totalParcours = countLicence + countMaster;
 
   return (
-    <div
-  className="container py-4 d-none d-lg-block"
-  
->
-      <h1 className="text-center mb-5 text-primary fw-bold">
-        Système Informatisé de Gestion – ISNM Antsiranana
-      </h1>
+    <div className="container mt-4">
+      <h2 className="mb-4">Tableau de bord – ISSTM Mahajanga</h2>
 
-      {/* Statistiques */}
-      <div className="row g-4 mb-5">
-        {statsData.map((stat, index) => (
-          <div className="col-md-6 col-lg-4" key={index}>
-            <StatsCard title={stat.title} value={stat.value} />
-          </div>
-        ))}
-      </div>
-      {/* Actions */}
-      <div className="row g-4">
-        {actionData.map((action, index) => (
-          <div className="col-12 col-md-6" key={index}>
-            <ActionCard title={action.title} links={action.links} />
-          </div>
-        ))}
-      </div>
+      <Row className="mb-4">
+        <Col md={4}>
+          <Card className="text-center shadow-sm">
+            <Card.Body>
+              <FaUniversity size={36} className="text-primary mb-2" />
+              <Card.Title>Licences professionnelles</Card.Title>
+              <h3>{countLicence}</h3>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={4}>
+          <Card className="text-center shadow-sm">
+            <Card.Body>
+              <FaGraduationCap size={36} className="text-success mb-2" />
+              <Card.Title>Masters Ingénieur</Card.Title>
+              <h3>{countMaster}</h3>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={4}>
+          <Card className="text-center shadow-sm">
+            <Card.Body>
+              <FaList size={36} className="text-warning mb-2" />
+              <Card.Title>Parcours disponibles</Card.Title>
+              <h3>{totalParcours}</h3>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row className="mb-4">
+        <Col md={4}>
+          <Form.Select
+            value={niveau}
+            onChange={(e) => {
+              setNiveau(e.target.value);
+              setMention('');
+              setParcours('');
+            }}
+          >
+            <option value="">-- Filtrer par niveau --</option>
+            {Object.keys(formations).map((niv) => (
+              <option key={niv}>{niv}</option>
+            ))}
+          </Form.Select>
+        </Col>
+        <Col md={4}>
+          <Form.Select
+            value={mention}
+            onChange={(e) => {
+              setMention(e.target.value);
+              setParcours('');
+            }}
+            disabled={!niveau}
+          >
+            <option value="">-- Filtrer par mention --</option>
+            {mentions.map((m) => (
+              <option key={m}>{m}</option>
+            ))}
+          </Form.Select>
+        </Col>
+        <Col md={4}>
+          <Form.Select
+            value={parcours}
+            onChange={(e) => setParcours(e.target.value)}
+            disabled={!mention}
+          >
+            <option value="">-- Filtrer par parcours --</option>
+            {parcoursList.map((p) => (
+              <option key={p}>{p}</option>
+            ))}
+          </Form.Select>
+        </Col>
+      </Row>
+
+      <Card>
+        <Card.Header>Liste des parcours disponibles</Card.Header>
+        <Card.Body className="p-0">
+          <Table striped bordered hover responsive>
+            <thead className="table-primary">
+              <tr>
+                <th>Niveau</th>
+                <th>Mention</th>
+                <th>Parcours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lignes.length > 0 ? (
+                lignes.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.niveau}</td>
+                    <td>{item.mention}</td>
+                    <td>{item.parcours}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center">Aucun parcours trouvé.</td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
     </div>
   );
 }
-
-export default DashboardOverview;
