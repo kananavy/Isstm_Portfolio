@@ -16,6 +16,7 @@ import Statistics from './pages/Statistics/Statistics';
 import About from './pages/Settings/About';
 import Profile from './pages/User/Profile';
 import Login from './pages/AuthPage/Login';
+import Logout from './pages/AuthPage/Logout';
 import Register from './pages/AuthPage/Register';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
                 <Route path="/statistiques" element={<Statistics />} />
                 <Route path="/parametres" element={<About />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/logout" element={<Logout />} />
               </Routes>
             </ProtectedLayout>
           }

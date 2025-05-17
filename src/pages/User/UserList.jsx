@@ -8,10 +8,10 @@ function UserList() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [activeUser, setActiveUser] = useState(null);
 
   const API_URL = 'http://localhost:3001/api/utilisateurs';
 
-  // Charger les utilisateurs depuis l'API
   const fetchUsers = async () => {
     try {
       const res = await axios.get(API_URL);
@@ -25,9 +25,33 @@ function UserList() {
 
   useEffect(() => {
     fetchUsers();
+
+    // Lire user actif dans localStorage au montage et à chaque changement de stockage
+    const storedActive = localStorage.getItem('userActive');
+    if (storedActive) setActiveUser(JSON.parse(storedActive));
+
+    // Optionnel : écouter le storage event pour actualiser si changement depuis un autre onglet
+    const onStorageChange = (e) => {
+      if (e.key === 'userActive') {
+        if (e.newValue) setActiveUser(JSON.parse(e.newValue));
+        else setActiveUser(null);
+      }
+    };
+    window.addEventListener('storage', onStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', onStorageChange);
+    };
   }, []);
 
-  // Suppression réelle via API
+  // Fonction pour vérifier si un utilisateur est actif (mise à jour il y a moins de 5 minutes)
+  const isUserActive = (email) => {
+    if (!activeUser) return false;
+    return (
+      email === activeUser.email && Date.now() - activeUser.lastActive < 5 * 60 * 1000 // 5 minutes
+    );
+  };
+
   const handleDelete = async (id) => {
     if (window.confirm('Confirmer la suppression ?')) {
       try {
@@ -39,7 +63,6 @@ function UserList() {
     }
   };
 
-  // Filtrage local
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -48,7 +71,6 @@ function UserList() {
 
   return (
     <div className="container mt-4">
-      {/* Titre + bouton Ajouter */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="mb-0">Liste des utilisateurs</h2>
         <Button as={Link} to="/users/add" variant="primary">
@@ -57,7 +79,6 @@ function UserList() {
         </Button>
       </div>
 
-      {/* Barre de recherche */}
       <InputGroup className="mb-3">
         <FormControl
           placeholder="Rechercher par nom ou email"
@@ -66,7 +87,6 @@ function UserList() {
         />
       </InputGroup>
 
-      {/* Affichage conditionnel du tableau */}
       {loading ? (
         <div className="text-center py-5">
           <Spinner animation="border" variant="primary" />
@@ -93,12 +113,11 @@ function UserList() {
                   <td>{user.email}</td>
                   <td>{user.role}</td>
                   <td>
-                    <Badge bg={user.status === 'Actif' ? 'success' : 'secondary'}>
-                      {user.status}
+                    <Badge bg={isUserActive(user.email) ? 'success' : 'secondary'}>
+                      {isUserActive(user.email) ? 'Actif' : 'Inactif'}
                     </Badge>
                   </td>
                   <td>
-                    {/* Modifier */}
                     <Button
                       as={Link}
                       to={`/users/edit/${user.id}`}
@@ -110,7 +129,6 @@ function UserList() {
                       <FaEdit />
                     </Button>
 
-                    {/* Supprimer */}
                     <Button
                       variant="outline-danger"
                       size="sm"

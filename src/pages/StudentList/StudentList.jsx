@@ -1,5 +1,5 @@
-// src/pages/StudentList/StudentList.jsx
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Table,
   Button,
@@ -13,30 +13,21 @@ import {
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-/* ─── Données fictives ───────────────────────────── */
-const mockStudents = [
-  {
-    id: 1,
-    matricule: 'ISST21-10-17FGCI/G.Info',
-    nom: 'RAKOTONOMENJANAHARY Elio Rachel',
-    niveau: 'Master Ingénieur',
-    mention: 'STNPA',
-    parcours: 'Génie Logiciel',
-    statut: 'Actif',
-  },
-  {
-    id: 2,
-    matricule: 'ISST22-03-11STGC/BTP',
-    nom: 'Andriamatoa Tiana',
-    niveau: 'Licence professionnelle',
-    mention: 'STGC',
-    parcours: 'Bâtiments et Travaux Publics',
-    statut: 'Inactif',
-  },
+// Options et cursus
+const niveauOptions = [
+  { code: 'LICENCE_PRO', label: 'Licence professionnelle' },
+  { code: 'MASTER_ING', label: 'Master Ingénieur' },
+];
+
+const mentionOptions = ['STNPA', 'STI', 'STGC'];
+
+const statutOptions = [
+  { code: 'ACTIF', label: 'Actif' },
+  { code: 'INACTIF', label: 'Inactif' },
 ];
 
 const cursus = {
-  'Licence professionnelle': {
+  LICENCE_PRO: {
     STNPA: [
       'Génie Informatique',
       'Génie Électronique Informatique',
@@ -49,7 +40,7 @@ const cursus = {
       "Génie de l'Architecture",
     ],
   },
-  'Master Ingénieur': {
+  MASTER_ING: {
     STNPA: [
       'Génie Logiciel',
       'Électronique et Informatique Industrielle',
@@ -76,7 +67,14 @@ export default function StudentList() {
   const [mention, setMention] = useState('');
   const [parcours, setParcours] = useState('');
 
-  useEffect(() => setStudents(mockStudents), []);
+  useEffect(() => {
+    let token = localStorage.getItem('token')
+    axios.get('http://localhost:3001/api/etudiants',{headers: { 
+      Authorization: `Bearer ${token}`
+    }})
+      .then((res) => setStudents(res.data))
+      .catch((err) => console.error('Erreur chargement étudiants :', err));
+  }, []);
 
   const mentions = niveau ? Object.keys(cursus[niveau]) : [];
   const parcoursList = niveau && mention ? cursus[niveau][mention] : [];
@@ -84,22 +82,32 @@ export default function StudentList() {
   const filtered = students.filter((s) => {
     const matchSearch =
       s.nom.toLowerCase().includes(search.toLowerCase()) ||
-      s.matricule.toLowerCase().includes(search.toLowerCase());
+      s.prenom?.toLowerCase().includes(search.toLowerCase()) ||
+      s.numero_inscription?.toLowerCase().includes(search.toLowerCase());
     const matchNiveau = !niveau || s.niveau === niveau;
     const matchMention = !mention || s.mention === mention;
     const matchParcours = !parcours || s.parcours === parcours;
     return matchSearch && matchNiveau && matchMention && matchParcours;
   });
 
+  const findLabel = (options, code) => {
+    const opt = options.find((o) => (typeof o === 'string' ? o === code : o.code === code));
+    if (typeof opt === 'string') return opt;
+    return opt ? opt.label : code;
+  };
+
   const handleDelete = (id) => {
     if (window.confirm('Confirmer la suppression ?')) {
-      setStudents((prev) => prev.filter((s) => s.id !== id));
+      fetch(`http://localhost:3001/api/etudiants/${id}`, {
+        method: 'DELETE',
+      })
+        .then(() => setStudents((prev) => prev.filter((s) => s.id !== id)))
+        .catch((err) => console.error('Erreur suppression :', err));
     }
   };
 
   return (
     <div className="container mt-4">
-      {/* Titre + bouton Ajouter */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="mb-0">Liste des étudiants</h2>
         <Button as={Link} to="/etudiants/add" variant="warning">
@@ -107,16 +115,14 @@ export default function StudentList() {
         </Button>
       </div>
 
-      {/* Barre de recherche */}
       <InputGroup className="mb-3">
         <FormControl
-          placeholder="Rechercher par nom ou matricule"
+          placeholder="Rechercher par nom, prénom ou matricule"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </InputGroup>
 
-      {/* Filtres Niveau / Mention / Parcours */}
       <Row className="mb-4">
         <Col md={4}>
           <Form.Select
@@ -128,8 +134,10 @@ export default function StudentList() {
             }}
           >
             <option value="">-- Filtrer par niveau --</option>
-            {Object.keys(cursus).map((niv) => (
-              <option key={niv}>{niv}</option>
+            {niveauOptions.map(({ code, label }) => (
+              <option key={code} value={code}>
+                {label}
+              </option>
             ))}
           </Form.Select>
         </Col>
@@ -144,7 +152,9 @@ export default function StudentList() {
           >
             <option value="">-- Filtrer par mention --</option>
             {mentions.map((m) => (
-              <option key={m}>{m}</option>
+              <option key={m} value={m}>
+                {m}
+              </option>
             ))}
           </Form.Select>
         </Col>
@@ -156,18 +166,24 @@ export default function StudentList() {
           >
             <option value="">-- Filtrer par parcours --</option>
             {parcoursList.map((p) => (
-              <option key={p}>{p}</option>
+              <option key={p} value={p}>
+                {p}
+              </option>
             ))}
           </Form.Select>
         </Col>
       </Row>
 
-      {/* Tableau */}
       <Table responsive bordered hover>
         <thead className="table-warning">
           <tr>
             <th>Matricule</th>
             <th>Nom</th>
+            <th>Prénom</th>
+            <th>Sexe</th>
+            <th>Niveau</th>
+            <th>Mention</th>
+            <th>Parcours</th>
             <th>Statut</th>
             <th style={{ width: '130px' }}>Actions</th>
           </tr>
@@ -176,11 +192,16 @@ export default function StudentList() {
           {filtered.length ? (
             filtered.map((s) => (
               <tr key={s.id}>
-                <td>{s.matricule}</td>
+                <td>{s.numero_inscription}</td>
                 <td>{s.nom}</td>
+                <td>{s.prenom}</td>
+                <td>{s.sexe === 'HOMME' ? 'Masculin' : s.sexe === 'FEMME' ? 'Féminin' : '-'}</td>
+                <td>{findLabel(niveauOptions, s.niveau)}</td>
+                <td>{s.mention}</td>
+                <td>{s.parcours}</td>
                 <td>
-                  <Badge bg={s.statut === 'Actif' ? 'success' : 'secondary'}>
-                    {s.statut}
+                  <Badge bg={s.statut === 'ACTIF' ? 'success' : 'secondary'}>
+                    {findLabel(statutOptions, s.statut)}
                   </Badge>
                 </td>
                 <td>
@@ -207,7 +228,7 @@ export default function StudentList() {
             ))
           ) : (
             <tr>
-              <td colSpan="4" className="text-center">
+              <td colSpan="9" className="text-center">
                 Aucun étudiant trouvé.
               </td>
             </tr>

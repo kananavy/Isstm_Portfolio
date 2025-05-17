@@ -3,93 +3,21 @@ import React, { useState } from 'react';
 import { Form, Button, Row, Col, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-// Codes/labels pour select (code envoyé au backend, label affiché à l'utilisateur)
-const niveauOptions = [
-  { code: 'L1', label: 'L1' },
-  { code: 'L2', label: 'L2' },
-  { code: 'L3', label: 'L3' },
-  { code: 'M1', label: 'M1' },
-  { code: 'M2', label: 'M2' },
-];
-
-const mentionOptions = ['STNPA', 'STI', 'STGC'];
-
-const statutOptions = [
-  { code: 'ACTIF', label: 'Actif' },
-  { code: 'INACTIF', label: 'Inactif' },
-];
-
-const sexeOptions = [
-  { code: 'HOMME', label: 'Masculin' },
-  { code: 'FEMME', label: 'Féminin' },
-];
-
-// Parcours détaillés selon niveau + mention
 const cursus = {
-  L1: {
-    STNPA: [
-      'Génie Informatique',
-      'Génie Électronique Informatique',
-      'Génie Biomédical',
-    ],
-    STI: [
-      'Génie Civil',
-      'Génie Industriel',
-    ],
-    STGC: [
-      'Gestion',
-      'Comptabilité',
-    ],
-  },
-  L2: {
+  'Licence professionnelle': {
     STNPA: [
       'Génie Informatique',
       'Génie Électronique Informatique',
       'Génie Biomédical (L2 après PACES ou équivalent)',
     ],
-    STI: [
-      'Génie Civil Avancé',
-      'Génie Industriel',
-    ],
-    STGC: [
-      'Gestion des Organisations',
-      'Fiscalité',
-    ],
-  },
-  L3: {
-    STNPA: [
-      'Génie Informatique',
-      'Génie Électronique Informatique',
-      'Génie Biomédical',
-    ],
-    STI: [
-      'Structures et Travaux Publics',
-      'Mécatronique',
-    ],
-    STGC: [
-      'Audit',
-      'Finance d’entreprise',
-    ],
-  },
-  M1: {
-    STNPA: [
-      'Génie Logiciel',
-      'Électronique et Informatique Industrielle',
-      'Télécommunications et Réseaux',
-      'Génie Biomédical',
-    ],
-    STI: [
-      'Ingénierie des Systèmes Électriques Automatisés',
-      'Génie Industriel',
-      'Froid et Énergie',
-    ],
+    STI: ['Génie Électrique', 'Génie Industriel', 'Froid et Énergie'],
     STGC: [
       'Bâtiments et Travaux Publics',
-      'Aménagements et Travaux Publics',
-      'Hydrauliques et Ouvrages',
+      'Génie Hydraulique',
+      "Génie de l'Architecture",
     ],
   },
-  M2: {
+  'Master Ingénieur': {
     STNPA: [
       'Génie Logiciel',
       'Électronique et Informatique Industrielle',
@@ -109,7 +37,6 @@ const cursus = {
   },
 };
 
-
 export default function StudentAdd() {
   const navigate = useNavigate();
 
@@ -120,24 +47,24 @@ export default function StudentAdd() {
     niveau: '',
     mention: '',
     parcours: '',
-    statut: 'ACTIF',
+    statut: 'Actif',
     sexe: '',
   });
 
-  // Récupération des mentions selon niveau sélectionné (codes)
   const mentions = form.niveau ? Object.keys(cursus[form.niveau]) : [];
-  // Récupération des parcours selon niveau et mention sélectionnés
   const parcours = form.niveau && form.mention ? cursus[form.niveau][form.mention] : [];
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Données envoyées:', form); // <-- Ajoute cette ligne
     try {
       const response = await fetch('http://localhost:3001/api/etudiants', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(form),
       });
 
@@ -208,11 +135,8 @@ export default function StudentAdd() {
                     required
                   >
                     <option value="">-- Sélectionner --</option>
-                    {sexeOptions.map(({ code, label }) => (
-                      <option key={code} value={code}>
-                        {label}
-                      </option>
-                    ))}
+                    <option value="Masculin">Masculin</option>
+                    <option value="Féminin">Féminin</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -236,10 +160,8 @@ export default function StudentAdd() {
                     required
                   >
                     <option value="">-- Sélectionner --</option>
-                    {niveauOptions.map(({ code, label }) => (
-                      <option key={code} value={code}>
-                        {label}
-                      </option>
+                    {Object.keys(cursus).map((niv) => (
+                      <option key={niv}>{niv}</option>
                     ))}
                   </Form.Select>
                 </Form.Group>
@@ -262,9 +184,7 @@ export default function StudentAdd() {
                   >
                     <option value="">-- Sélectionner --</option>
                     {mentions.map((m) => (
-                      <option key={m} value={m}>
-                        {m}
-                      </option>
+                      <option key={m}>{m}</option>
                     ))}
                   </Form.Select>
                 </Form.Group>
@@ -281,9 +201,7 @@ export default function StudentAdd() {
                   >
                     <option value="">-- Sélectionner --</option>
                     {parcours.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
+                      <option key={p}>{p}</option>
                     ))}
                   </Form.Select>
                 </Form.Group>
@@ -296,13 +214,9 @@ export default function StudentAdd() {
                 name="statut"
                 value={form.statut}
                 onChange={handleChange}
-                required
               >
-                {statutOptions.map(({ code, label }) => (
-                  <option key={code} value={code}>
-                    {label}
-                  </option>
-                ))}
+                <option>Actif</option>
+                <option>Inactif</option>
               </Form.Select>
             </Form.Group>
 

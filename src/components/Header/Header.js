@@ -9,15 +9,40 @@ function Header({ isSidebarOpen }) {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Récupérer l'utilisateur depuis le localStorage
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+    }
+  }, [navigate]);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const user = JSON.parse(storedUser);
-      setUsername(user.name || user.email || 'Utilisateur'); // Prend 'nom', sinon 'email'
+      setUsername(user.name || user.email || 'Utilisateur');
     } else {
-      setUsername(''); // Aucun utilisateur connecté
+      setUsername('');
     }
+  }, []);
+
+  // --- AJOUT : mise à jour périodique statut actif ---
+  useEffect(() => {
+    const updateActiveStatus = () => {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        localStorage.setItem(
+          'userActive',
+          JSON.stringify({ email: user.email, lastActive: Date.now() })
+        );
+      }
+    };
+
+    updateActiveStatus(); // Update au montage
+    const interval = setInterval(updateActiveStatus, 60000); // puis toutes les 1 min
+
+    return () => clearInterval(interval);
   }, []);
 
   const initial = username ? username.charAt(0).toUpperCase() : '?';
@@ -29,11 +54,11 @@ function Header({ isSidebarOpen }) {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('user'); // important si tu stockes l'utilisateur
+    localStorage.removeItem('user');
+    localStorage.removeItem('userActive'); // supprimer aussi le statut actif
     navigate('/');
   };
 
-  // Fermer le menu si clic hors zone
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -51,13 +76,13 @@ function Header({ isSidebarOpen }) {
 
   return (
     <header className={`header ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-      <div className="breadcrumbs">
-        {/* Tu peux mettre ici un titre ou chemin dynamique */}
-      </div>
+      <div className="breadcrumbs"></div>
 
       <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div ref={dropdownRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          {/* Cercle initiale */}
+        <div
+          ref={dropdownRef}
+          style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
           <div
             onClick={handleToggleMenu}
             style={{
@@ -79,10 +104,8 @@ function Header({ isSidebarOpen }) {
             {initial}
           </div>
 
-          {/* Nom utilisateur */}
           <span className="user-name"> {username}</span>
 
-          {/* Bouton déconnexion */}
           <button className="notification-btn" aria-label="Déconnexion" onClick={handleLogout}>
             <FaPowerOff />
           </button>

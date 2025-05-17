@@ -1,99 +1,179 @@
-// src/pages/StudentAdd/StudentAdd.jsx
-import React, { useState } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+// src/pages/StudentEdit.jsx
+import React, { useState, useEffect } from "react";
+import { Form, Button, Row, Col } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 
-/* ─── Structure Niveau → Mention → Parcours ───────── */
+/* ─── Options de sélection ─────────────────────────── */
+const niveauOptions = [
+  { code: "LICENCE_PRO", label: "Licence professionnelle" },
+  { code: "MASTER_ING", label: "Master Ingénieur" },
+];
+
+const sexeOptions = [
+  { code: "HOMME", label: "Masculin" },
+  { code: "FEMME", label: "Féminin" },
+];
+
+const statutOptions = [
+  { code: "ACTIF", label: "Actif" },
+  { code: "INACTIF", label: "Inactif" },
+];
+
+/* ─── Cursus dépendant Niveau → Mention → Parcours ─── */
 const cursus = {
-  'Licence professionnelle': {
+  LICENCE_PRO: {
     STNPA: [
-      'Génie Informatique',
-      'Génie Électronique Informatique',
-      'Génie Biomédical (L2 après PACES ou équivalent)',
+      "Génie Informatique",
+      "Génie Électronique Informatique",
+      "Génie Biomédical (L2 après PACES ou équivalent)",
     ],
-    STI: ['Génie Électrique', 'Génie Industriel', 'Froid et Énergie'],
+    STI: ["Génie Électrique", "Génie Industriel", "Froid et Énergie"],
     STGC: [
-      'Bâtiments et Travaux Publics',
-      'Génie Hydraulique',
-      'Génie de l\'Architecture',
+      "Bâtiments et Travaux Publics",
+      "Génie Hydraulique",
+      "Génie de l'Architecture",
     ],
   },
-  'Master Ingénieur': {
+  MASTER_ING: {
     STNPA: [
-      'Génie Logiciel',
-      'Électronique et Informatique Industrielle',
-      'Télécommunications et Réseaux',
-      'Génie Biomédical',
+      "Génie Logiciel",
+      "Électronique et Informatique Industrielle",
+      "Télécommunications et Réseaux",
+      "Génie Biomédical",
     ],
     STI: [
-      'Ingénierie des Systèmes Électriques Automatisés',
-      'Génie Industriel',
-      'Froid et Énergie',
+      "Ingénierie des Systèmes Électriques Automatisés",
+      "Génie Industriel",
+      "Froid et Énergie",
     ],
     STGC: [
-      'Bâtiments et Travaux Publics',
-      'Aménagements et Travaux Publics',
-      'Hydrauliques et Ouvrages',
+      "Bâtiments et Travaux Publics",
+      "Aménagements et Travaux Publics",
+      "Hydrauliques et Ouvrages",
     ],
   },
 };
 
 export default function StudentEdit() {
   const navigate = useNavigate();
+  const { id } = useParams();
 
-  /* États du formulaire */
+  /* ─── État du formulaire ─────────────────────────── */
   const [form, setForm] = useState({
-    nom: '',
-    matricule: '',
-    niveau: '',
-    mention: '',
-    parcours: '',
-    statut: 'Actif',
+    nom: "",
+    prenom: "",
+    numero_inscription: "",
+    niveau: "",
+    mention: "",
+    parcours: "",
+    sexe: "",
+    statut: "ACTIF",
   });
 
-  /* Helpers pour listes dépendantes */
+  /* Listes dépendantes */
   const mentions = form.niveau ? Object.keys(cursus[form.niveau]) : [];
-  const parcours = form.niveau && form.mention ? cursus[form.niveau][form.mention] : [];
+  const parcours =
+    form.niveau && form.mention ? cursus[form.niveau][form.mention] : [];
 
+  /* ─── Charger l'étudiant à éditer ─────────────────── */
+  useEffect(() => {
+    if (!id) return;
+
+    (async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/api/etudiants/${id}`);
+        if (!res.ok) throw new Error("Erreur de récupération");
+        const data = await res.json();
+        setForm({
+          nom: data.nom ?? "",
+          prenom: data.prenom ?? "",
+          numero_inscription: data.numero_inscription ?? "",
+          niveau: data.niveau ?? "",
+          mention: data.mention ?? "",
+          parcours: data.parcours ?? "",
+          sexe: data.sexe ?? "",
+          statut: data.statut ?? "ACTIF",
+        });
+      } catch (err) {
+        console.error(err);
+        alert("Impossible de charger cet étudiant.");
+      }
+    })();
+  }, [id]);
+
+  /* ─── Handlers ────────────────────────────────────── */
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.table(form); // À remplacer par une requête API
-    alert('Étudiant enregistré !');
-    navigate('/etudiants');
+    try {
+      const res = await fetch(`http://localhost:3001/api/etudiants/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Erreur de mise à jour");
+      await res.json();
+      alert("Étudiant modifié avec succès !");
+      navigate("/etudiants");
+    } catch (err) {
+      console.error(err);
+      alert("Échec de la modification de l'étudiant.");
+    }
   };
 
+  /* ─── Rendu ───────────────────────────────────────── */
   return (
-    <div className="container mt-4">
-      <h2>Modifier un étudiant</h2>
+    <div className="container mt-5">
+      <h2 className="mb-4 text-warning">Modifier un étudiant</h2>
+
       <Form onSubmit={handleSubmit}>
+        {/* Nom & Prénom */}
         <Row className="mb-3">
           <Col md={6}>
             <Form.Group>
-              <Form.Label>Nom complet</Form.Label>
+              <Form.Label>Nom</Form.Label>
               <Form.Control
                 name="nom"
                 value={form.nom}
                 onChange={handleChange}
+                placeholder="Ex : RAKOTOARISOA"
                 required
               />
             </Form.Group>
           </Col>
           <Col md={6}>
             <Form.Group>
-              <Form.Label>Matricule</Form.Label>
+              <Form.Label>Prénom</Form.Label>
               <Form.Control
-                name="matricule"
-                value={form.matricule}
+                name="prenom"
+                value={form.prenom}
                 onChange={handleChange}
+                placeholder="Ex : Jean"
                 required
               />
             </Form.Group>
           </Col>
         </Row>
 
+        {/* Numéro d'inscription */}
+        <Row className="mb-3">
+          <Col md={6}>
+            <Form.Group>
+              <Form.Label>Numéro d’inscription</Form.Label>
+              <Form.Control
+                name="numero_inscription"
+                value={form.numero_inscription}
+                onChange={handleChange}
+                placeholder="Ex : ISST21-10-17FGCI/G.Info"
+                required
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+
+        {/* Niveau / Mention / Parcours */}
         <Row className="mb-3">
           <Col md={4}>
             <Form.Group>
@@ -105,15 +185,17 @@ export default function StudentEdit() {
                   setForm({
                     ...form,
                     niveau: e.target.value,
-                    mention: '',
-                    parcours: '',
+                    mention: "",
+                    parcours: "",
                   })
                 }
                 required
               >
-                <option value="">-- Choisir --</option>
-                {Object.keys(cursus).map((niv) => (
-                  <option key={niv}>{niv}</option>
+                <option value="">-- Sélectionner --</option>
+                {niveauOptions.map(({ code, label }) => (
+                  <option key={code} value={code}>
+                    {label}
+                  </option>
                 ))}
               </Form.Select>
             </Form.Group>
@@ -126,18 +208,16 @@ export default function StudentEdit() {
                 name="mention"
                 value={form.mention}
                 onChange={(e) =>
-                  setForm({
-                    ...form,
-                    mention: e.target.value,
-                    parcours: '',
-                  })
+                  setForm({ ...form, mention: e.target.value, parcours: "" })
                 }
                 disabled={!form.niveau}
                 required
               >
-                <option value="">-- Choisir --</option>
+                <option value="">-- Sélectionner --</option>
                 {mentions.map((m) => (
-                  <option key={m}>{m}</option>
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
                 ))}
               </Form.Select>
             </Form.Group>
@@ -153,30 +233,62 @@ export default function StudentEdit() {
                 disabled={!form.mention}
                 required
               >
-                <option value="">-- Choisir --</option>
+                <option value="">-- Sélectionner --</option>
                 {parcours.map((p) => (
-                  <option key={p}>{p}</option>
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
                 ))}
               </Form.Select>
             </Form.Group>
           </Col>
         </Row>
 
-        <Form.Group className="mb-4">
-          <Form.Label>Statut</Form.Label>
-          <Form.Select
-            name="statut"
-            value={form.statut}
-            onChange={handleChange}
-          >
-            <option>Actif</option>
-            <option>Inactif</option>
-          </Form.Select>
-        </Form.Group>
+        {/* Sexe & Statut */}
+        <Row className="mb-4">
+          <Col md={4}>
+            <Form.Group controlId="formSexe">
+              <Form.Label>Sexe</Form.Label>
+              <Form.Select
+                name="sexe"
+                value={form.sexe || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">-- Sélectionner --</option>
+                {sexeOptions.map(({ code, label }) => (
+                  <option key={code} value={code}>
+                    {label}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
 
-        <Button variant="warning" type="submit">
-          Enregistrer
-        </Button>
+          <Col md={4}>
+            <Form.Group>
+              <Form.Label>Statut</Form.Label>
+              <Form.Select
+                name="statut"
+                value={form.statut}
+                onChange={handleChange}
+                required
+              >
+                {statutOptions.map(({ code, label }) => (
+                  <option key={code} value={code}>
+                    {label}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
+
+        <div className="d-flex justify-content-end">
+          <Button type="submit" variant="warning">
+            Enregistrer
+          </Button>
+        </div>
       </Form>
     </div>
   );
