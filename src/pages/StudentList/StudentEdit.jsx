@@ -5,8 +5,11 @@ import { useNavigate, useParams } from "react-router-dom";
 
 /* ─── Options de sélection ─────────────────────────── */
 const niveauOptions = [
-  { code: "LICENCE_PRO", label: "Licence professionnelle" },
-  { code: "MASTER_ING", label: "Master Ingénieur" },
+  { code: 'L1', label: 'L1' },
+  { code: 'L2', label: 'L2' },
+  { code: 'L3', label: 'L3' },
+  { code: 'M1', label: 'M1' },
+  { code: 'M2', label: 'M2' },
 ];
 
 const sexeOptions = [
@@ -21,38 +24,89 @@ const statutOptions = [
 
 /* ─── Cursus dépendant Niveau → Mention → Parcours ─── */
 const cursus = {
-  LICENCE_PRO: {
+  L1: {
     STNPA: [
-      "Génie Informatique",
-      "Génie Électronique Informatique",
-      "Génie Biomédical (L2 après PACES ou équivalent)",
-    ],
-    STI: ["Génie Électrique", "Génie Industriel", "Froid et Énergie"],
-    STGC: [
-      "Bâtiments et Travaux Publics",
-      "Génie Hydraulique",
-      "Génie de l'Architecture",
-    ],
-  },
-  MASTER_ING: {
-    STNPA: [
-      "Génie Logiciel",
-      "Électronique et Informatique Industrielle",
-      "Télécommunications et Réseaux",
-      "Génie Biomédical",
+      'Génie Informatique',
+      'Génie Électronique Informatique',
+      'Génie Biomédical',
     ],
     STI: [
-      "Ingénierie des Systèmes Électriques Automatisés",
-      "Génie Industriel",
-      "Froid et Énergie",
+      'Génie Civil',
+      'Génie Industriel',
     ],
     STGC: [
-      "Bâtiments et Travaux Publics",
-      "Aménagements et Travaux Publics",
-      "Hydrauliques et Ouvrages",
+      'Gestion',
+      'Comptabilité',
+    ],
+  },
+  L2: {
+    STNPA: [
+      'Génie Informatique',
+      'Génie Électronique Informatique',
+      'Génie Biomédical (L2 après PACES ou équivalent)',
+    ],
+    STI: [
+      'Génie Civil Avancé',
+      'Génie Industriel',
+    ],
+    STGC: [
+      'Gestion des Organisations',
+      'Fiscalité',
+    ],
+  },
+  L3: {
+    STNPA: [
+      'Génie Informatique',
+      'Génie Électronique Informatique',
+      'Génie Biomédical',
+    ],
+    STI: [
+      'Structures et Travaux Publics',
+      'Mécatronique',
+    ],
+    STGC: [
+      'Audit',
+      'Finance d’entreprise',
+    ],
+  },
+  M1: {
+    STNPA: [
+      'Génie Logiciel',
+      'Électronique et Informatique Industrielle',
+      'Télécommunications et Réseaux',
+      'Génie Biomédical',
+    ],
+    STI: [
+      'Ingénierie des Systèmes Électriques Automatisés',
+      'Génie Industriel',
+      'Froid et Énergie',
+    ],
+    STGC: [
+      'Bâtiments et Travaux Publics',
+      'Aménagements et Travaux Publics',
+      'Hydrauliques et Ouvrages',
+    ],
+  },
+  M2: {
+    STNPA: [
+      'Génie Logiciel',
+      'Électronique et Informatique Industrielle',
+      'Télécommunications et Réseaux',
+      'Génie Biomédical',
+    ],
+    STI: [
+      'Ingénierie des Systèmes Électriques Automatisés',
+      'Génie Industriel',
+      'Froid et Énergie',
+    ],
+    STGC: [
+      'Bâtiments et Travaux Publics',
+      'Aménagements et Travaux Publics',
+      'Hydrauliques et Ouvrages',
     ],
   },
 };
+
 
 export default function StudentEdit() {
   const navigate = useNavigate();
